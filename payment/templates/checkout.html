@@ -9,19 +9,21 @@
   <body>
     <section>
       <div class="product">
-        <img width='100px' height='100px' src="{{product.image.url}}" alt="The cover of Stubborn Attachments" />
+        <img src="https://i.imgur.com/EHyR2nP.png" alt="The cover of Stubborn Attachments" />
         <div class="description">
-          <h3>{{product.name}}</h3>
-          <h5>${{product.get_display_price}}</h5>
+          <h3>Stubborn Attachments</h3>
+          <h5>$20.00</h5>
         </div>
       </div>
-      {% comment %} <form action="/create-checkout-session" method="POST">  {% endcomment %}
+      {% comment %} <form action="/create-checkout-session" method="POST"> {% endcomment %}
+        {% csrf_token %}
         <button type="submit" id="checkout-button">Checkout</button>
-   {% comment %} </form> {% endcomment %}
+      {% comment %} </form> {% endcomment %}
     </section>
-    {% csrf_token %}
+    
   </body>
   <script type="text/javascript">
+    {% comment %} {% csrf_token %} {% endcomment %}
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     // Create an instance of the Stripe object with your publishable API key
     var stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
@@ -39,17 +41,7 @@
         .then(function (session) {
           return stripe.redirectToCheckout({ sessionId: session.id });
         })
-        //.then(function (result) {
-          // If redirectToCheckout fails due to a browser or network
-          // error, you should display the localized error message to your
-          // customer using error.message.
-          //if (result.error) {
-           // alert(result.error.message);
-          //}
-        //})
-        //.catch(function (error) {
-        //  console.error("Error:", error);
-        //}); 
+       
     });
-     </script>
+  </script>
 </html>

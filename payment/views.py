@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponse
 # Create your views here.
 
 class LandingPage(TemplateView):
-    template_name = "landing_page.html"
+    template_name = "checkout.html"
 
     def get_context_data(self, **kwargs):
         product = Product.objects.get(name="Book")
@@ -18,6 +18,7 @@ class LandingPage(TemplateView):
             "product": product,
             "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
         })
+        print(context)
         return context
 
 
@@ -32,23 +33,36 @@ class CancelView(TemplateView):
 
 
 class CreateCheckoutSessionView(View):
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
+        product_id = self.kwargs["pk"]
+        product = Product.objects.get(id=product_id)
         YOUR_DOMAIN = "http://127.0.0.1:8000"
-        try:
-            checkout_session = stripe.checkout.Session.create(
-                line_items=[
-                    {
-                        # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                        'price': '{{PRICE_ID}}',
-                        'quantity': 1,
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'inr',
+                        'unit_amount': product.price,
+                        'product_data': {
+                            'name': product.name,
+                            # 'images': ['https://i.imgur.com/EHyR2nP.png'],
+                        },
                     },
-                ],
-                mode='payment',
-                success_url=YOUR_DOMAIN + '/success.html',
-                cancel_url=YOUR_DOMAIN + '/cancel.html',
-            )
-        except Exception as e:
-            return str(e)
-    
-        return redirect(checkout_session.url, code=303)
+                    'quantity': 1,
+                },
+            ],
+            metadata={
+                "product_id": product.id
+            },
+            mode='payment',
+            success_url=YOUR_DOMAIN + '/success/',
+            cancel_url=YOUR_DOMAIN + '/cancel/',
+        )
+        return JsonResponse({
+            'id': checkout_session.id
+        })
+
+
+        
     
