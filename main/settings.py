@@ -12,19 +12,29 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+DEBUG = env('DEBUG')
+
+SECRET_KEY = env('SECRET_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zacmgr-!*gosv0s*@tmo3_z4sl%(6s55dt9_-vjgqt7wpkxeh!'
+# SECRET_KEY = 'django-insecure-zacmgr-!*gosv0s*@tmo3_z4sl%(6s55dt9_-vjgqt7wpkxeh!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -133,6 +143,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static_media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-STRIPE_SECRET_KEY="sk_test_51L3drLSBN7WqSIkpz3kKUoijl0LfxLBZTykfLr5GzN9rUooJKShWkpzJ4eaxzkZi8y6N4FVMSmifb7o9dntDHLAs00VMfsIqcE"
-STRIPE_PUBLIC_KEY="pk_test_51L3drLSBN7WqSIkpYdOFdttKauIvhwSNhqZzqiTtVIOLKOR5Wobl3Uuk7P9cPDPya58ejgWWsXxjlOeulQBYy2rK00gPjOzpzU"
+
+#stripe credentials
+
+STRIPE_SECRET_KEY=env('STRIPE_SECRET_KEY')
+STRIPE_PUBLIC_KEY=env('STRIPE_PUBLIC_KEY')
+STRIPE_WEBHOOK_SECRET=env('STRIPE_WEBHOOK_SECRET')

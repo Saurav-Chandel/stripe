@@ -9,10 +9,10 @@
   <body>
     <section>
       <div class="product">
-        <img src="https://i.imgur.com/EHyR2nP.png" alt="The cover of Stubborn Attachments" />
+        <img width='100px' src="{{product.file.url}}" alt="The cover of Stubborn Attachments" />
         <div class="description">
-          <h3>Stubborn Attachments</h3>
-          <h5>$20.00</h5>
+          <h3>{{product.name}}</h3>
+          <h5>{{product.price}}</h5>
         </div>
       </div>
       {% comment %} <form action="/create-checkout-session" method="POST"> {% endcomment %}
