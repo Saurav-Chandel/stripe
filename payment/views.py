@@ -137,18 +137,16 @@ import json
 #         except Exception as e:
 #             return JsonResponse({ 'error': str(e) })              
 
-
-
-
-
 ####################
 class ProductListView(ListView):
     model = Product
     template_name = "product_list.html"
     context_object_name = 'product_list'
-
- 
-
+    
+    """
+    context_object_name - Name of the context object that will hold the list of products. Django will automatically fetch the list of products,
+    so that we do not have to write the query to fetch products from the database.
+    """
 
 class ProductCreateView(CreateView):
     model = Product
@@ -162,18 +160,25 @@ class ProductDetailView(DetailView):
     template_name = "product_detail.html"
     pk_url_kwarg = 'id'
 
-
+    '''
+    Here in this code, we are overriding the get_context_data() method to add publishable key as a data to the template context.
+    We set pk_url_kwarg = 'id' to instruct Django to fetch details of the product with the id passed as a URL parameter.
+    '''
+    
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
+        print(context)
         context['stripe_publishable_key'] = settings.STRIPE_PUBLIC_KEY
         print(context)
         return context  
 
 @csrf_exempt
 def create_checkout_session(request, id):
-
+    print(id)
     request_data = json.loads(request.body)
+    # print(request_data)
     product = get_object_or_404(Product, pk=id)
+    # print(product)
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
     checkout_session = stripe.checkout.Session.create(
@@ -220,11 +225,14 @@ class PaymentSuccessView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         session_id = request.GET.get('session_id')
+        # print(session_id)
         if session_id is None:
             return HttpResponseNotFound()
         
         stripe.api_key = settings.STRIPE_SECRET_KEY
+        # print(stripe.api_key)
         session = stripe.checkout.Session.retrieve(session_id)
+        # print(session)
 
         order = get_object_or_404(OrderDetail, stripe_payment_intent=session.payment_intent)
         order.has_paid = True
@@ -236,4 +244,4 @@ class PaymentFailedView(TemplateView):
 
 class OrderHistoryListView(ListView):
     model = OrderDetail
-    template_name = "order_history.html"
+    template_name = "order_history.html"    

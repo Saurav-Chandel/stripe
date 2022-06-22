@@ -41,7 +41,6 @@
         .then(function (session) {
           return stripe.redirectToCheckout({ sessionId: session.id });
         })
-       
     });
   </script>
 </html>
